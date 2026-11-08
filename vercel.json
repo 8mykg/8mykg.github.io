@@ -1,5 +1,5 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm run build",
+  "buildCommand": "cd rust-core && wasm-pack build --target web --out-dir pkg && cd .. && npm run build",
   "outputDirectory": "dist"
 }
