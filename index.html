@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile & WASM</title>
+  <style>
+    :root {
+      --bg-color: #121820;
+      --card-bg: #1a232e;
+      --text-color: #e1e7ed;
+      --accent-color: #64b5f6;
+      --rust-color: #ff6b4a;
+      --border-color: #263342;
+    }
+    body {
+      font-family: sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .rust-box {
+      border: 1px solid var(--rust-color);
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>My Profile Page</h1>
+  <p>Vite + Vercel + Rust (WASM) のロマン爆発構成だにぇ！</p>
+
+  <!-- Rustからの出力を受ける場所 -->
+  <div class="rust-box">
+    <h3>🦀 Rust (WASM) Output</h3>
+    <p id="rust-message">WASM読み込み中...</p>
+  </div>
+
+  <!-- WASM読み込みスクリプト -->
+  <script type="module">
+    import init, { rust_greeting } from './rust-core/pkg/rust_core.js';
+
+    async function run() {
+      // WASMモジュールの初期化
+      await init();
+
+      // Rust側で定義した関数を実行！
+      const result = rust_greeting("バイブコーディング貴族");
+      
+      // 画面に結果を表示
+      document.getElementById('rust-message').textContent = result;
+      console.log('Rust output:', result);
+    }
+
+    run();
+  </script>
+
+</body>
+</html>
