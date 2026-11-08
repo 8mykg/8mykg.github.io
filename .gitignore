@@ -2,4 +2,3 @@ node_modules
 dist
 .vite
 rust-core/target
-rust-core/pkg
