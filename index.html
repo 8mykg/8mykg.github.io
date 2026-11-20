@@ -1,64 +1,341 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile & WASM</title>
+  <title>My Profile</title>
   <style>
     :root {
       --bg-color: #121820;
       --card-bg: #1a232e;
       --text-color: #e1e7ed;
+      --text-muted: #94a3b8;
       --accent-color: #64b5f6;
-      --rust-color: #ff6b4a;
       --border-color: #263342;
     }
+
+    [data-theme="light"] {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --text-muted: #64748b;
+      --accent-color: #0284c7;
+      --border-color: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
-      padding: 2rem;
-      max-width: 600px;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      max-width: 640px;
       margin: 0 auto;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
-    .rust-box {
-      border: 1px solid var(--rust-color);
+
+    /* テーマコントロールエリア */
+    .theme-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .theme-btn {
       background-color: var(--card-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-btn:hover:not(:disabled) {
+      border-color: var(--accent-color);
+    }
+
+    /* 自動モード時は手動ボタンを少し薄くして無効化 */
+    .theme-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* ちっちゃいスイッチの装飾 */
+    .auto-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .auto-switch {
+      appearance: none;
+      width: 28px;
+      height: 16px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .auto-switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 10px;
+      height: 10px;
+      background-color: var(--text-muted);
+      border-radius: 50%;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .auto-switch:checked {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .auto-switch:checked::after {
+      transform: translateX(12px);
+      background-color: #ffffff;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background-color: var(--card-bg);
+      border: 2px solid var(--accent-color);
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .tagline {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      color: var(--accent-color);
+      margin-bottom: 1.0rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .link-btn {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      padding: 0.7rem;
       border-radius: 8px;
-      padding: 1rem;
-      margin-top: 1.5rem;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .link-btn:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 3rem;
     }
   </style>
 </head>
+
 <body>
 
-  <h1>My Profile Page</h1>
-  <p>Vite + Vercel + Rust (WASM) のロマン爆発構成だにぇ！</p>
-
-  <!-- Rustからの出力を受ける場所 -->
-  <div class="rust-box">
-    <h3>🦀 Rust (WASM) Output</h3>
-    <p id="rust-message">WASM読み込み中...</p>
+  <div class="theme-controls">
+    <button id="theme-toggle" class="theme-btn">ライト/ダークモード切替</button>
+    <label class="auto-switch-label">
+      <span id="auto-switch-text">前回のモードを保持する</span>
+      <input type="checkbox" id="auto-theme-switch" class="auto-switch">
+    </label>
   </div>
 
-  <!-- WASM読み込みスクリプト -->
-  <script type="module">
-    import init, { rust_greeting } from './rust-core/pkg/rust_core.js';
+  <header>
+    <img src="makebead-256x256.png" alt="アイコン" class="avatar">
+    <h1>つまよーじ</h1>
+    <p class="tagline">中学生 / Web開発に人生を捧げた</p>
+  </header>
 
-    async function run() {
-      // WASMモジュールの初期化
-      await init();
+  <main>
+    <section class="card">
+      <h2>About Me</h2>
+      <p>
+        はじめまして！プログラミングやものづくりに興味があって、このページを作りました。
+        最近はHTML/CSSやJavaScriptを触りながら、作ったものをVercelで公開して遊んでいます。
+      </p>
+    </section>
 
-      // Rust側で定義した関数を実行！
-      const result = rust_greeting("バイブコーディング貴族");
-      
-      // 画面に結果を表示
-      document.getElementById('rust-message').textContent = result;
-      console.log('Rust output:', result);
-    }
+    <section class="card">
+      <h2>Skills & Interests</h2>
+      <div class="tags">
+        <span class="tag">HTML / CSS</span>
+        <span class="tag">JavaScript</span>
+        <span class="tag">GitHub</span>
+        <span class="tag">ゲーム</span>
+        <span class="tag">音楽鑑賞</span>
+      </div>
+    </section>
 
-    run();
+    <section class="card">
+      <h2>Links</h2>
+      <div class="links">
+        <a href="https://github.com/8mykg" target="_blank" class="link-btn">GitHub</a>
+        <a href="https://x.com/fafogame5" target="_blank" class="link-btn">X (Twitter)</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; Copyright 2026 tumayouzi_Dev.All rights reserved.
+  </footer>
+
+  <script>
+    const toggleBtn = document.getElementById('theme-toggle');
+    const autoSwitch = document.getElementById('auto-theme-switch');
+    const autoSwitchText = document.getElementById('auto-switch-text');
+    const htmlElement = document.documentElement;
+    const osLightQuery = window.matchMedia('(prefers-color-scheme: light)');
+
+    // テーマを画面に反映する関数
+    const applyTheme = (theme) => {
+      if (theme === 'light') {
+        htmlElement.setAttribute('data-theme', 'light');
+      } else {
+        htmlElement.removeAttribute('data-theme');
+      }
+    };
+
+    // UI（ボタンの有効/無効やテキスト）を現在のモードに合わせて更新する関数
+    const updateControlsUI = (isAuto) => {
+      autoSwitch.checked = isAuto;
+      toggleBtn.disabled = isAuto;
+      autoSwitchText.textContent = isAuto
+        ? 'システムに応じて自動で切り替える'
+        : '前回のモードを保持する';
+    };
+
+    // 1. 初期読み込み時のセットアップ
+    const initTheme = () => {
+      const mode = localStorage.getItem('themeMode') || 'auto'; // デフォルトは自動
+      const isAuto = mode === 'auto';
+
+      updateControlsUI(isAuto);
+
+      if (isAuto) {
+        applyTheme(osLightQuery.matches ? 'light' : 'dark');
+      } else {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(savedTheme);
+      }
+    };
+
+    // 2. スイッチ切り替え時の処理（自動 <-> 前回のモードを保持）
+    autoSwitch.addEventListener('change', (e) => {
+      const isAuto = e.target.checked;
+      updateControlsUI(isAuto);
+
+      if (isAuto) {
+        localStorage.setItem('themeMode', 'auto');
+        applyTheme(osLightQuery.matches ? 'light' : 'dark');
+      } else {
+        localStorage.setItem('themeMode', 'manual');
+        const currentTheme = htmlElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+        localStorage.setItem('theme', currentTheme);
+      }
+    });
+
+    // 3. 手動モード切替ボタンの処理
+    toggleBtn.addEventListener('click', () => {
+      if (autoSwitch.checked) return;
+
+      const currentTheme = htmlElement.getAttribute('data-theme');
+      const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+      applyTheme(nextTheme);
+      localStorage.setItem('theme', nextTheme);
+    });
+
+    // 4. 自動モード中、OS側のテーマがリアルタイムで変わったら即座に追従する
+    osLightQuery.addEventListener('change', (e) => {
+      if (autoSwitch.checked) {
+        applyTheme(e.matches ? 'light' : 'dark');
+      }
+    });
+
+    initTheme();
   </script>
 
 </body>
+
 </html>
