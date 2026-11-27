@@ -4,24 +4,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile</title>
+  <title>つまよーじ | tumayouzi_Dev</title>
+  <meta name="description" content="Web開発に人生を捧げた、つまよーじ（tumayouzi_Dev）のプロフィールページ。">
+  <meta property="og:title" content="つまよーじ | tumayouzi_Dev">
+  <meta property="og:description" content="Web開発に人生を捧げた — HTML / CSS / JavaScript / 勢いとノリ">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="makebead-256x256.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <!-- Prevent theme flash before first paint -->
+  <script>
+    (function () {
+      const mode = localStorage.getItem('themeMode') || 'auto';
+      const osLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      const theme = mode === 'auto'
+        ? (osLight ? 'light' : 'dark')
+        : (localStorage.getItem('theme') || 'dark');
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
   <style>
     :root {
-      --bg-color: #121820;
-      --card-bg: #1a232e;
-      --text-color: #e1e7ed;
-      --text-muted: #94a3b8;
-      --accent-color: #64b5f6;
-      --border-color: #263342;
+      --bg: #000000;
+      --surface: #09090b;
+      --surface-hover: #111114;
+      --text: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --border: rgba(255, 255, 255, 0.13);
+      --border-strong: rgba(255, 255, 255, 0.34);
+      --inv-bg: #ffffff;
+      --inv-text: #000000;
+      --spotlight: rgba(255, 255, 255, 0.08);
+      --spotlight-border: rgba(255, 255, 255, 0.45);
+      --glass: rgba(0, 0, 0, 0.68);
+      --status-dot: #22c55e;
+      --accent-warm: #fde047;
+      --shadow-card: 0 24px 60px rgba(0, 0, 0, 0.65);
+
+      --font-display: 'Syne', 'Noto Sans JP', sans-serif;
+      --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     [data-theme="light"] {
-      --bg-color: #f1f5f9;
-      --card-bg: #ffffff;
-      --text-color: #1e293b;
-      --text-muted: #64748b;
-      --accent-color: #0284c7;
-      --border-color: #cbd5e1;
+      --bg: #ffffff;
+      --surface: #fafafa;
+      --surface-hover: #f4f4f5;
+      --text: #000000;
+      --text-secondary: #52525b;
+      --text-muted: #a1a1aa;
+      --border: rgba(0, 0, 0, 0.11);
+      --border-strong: rgba(0, 0, 0, 0.32);
+      --inv-bg: #000000;
+      --inv-text: #ffffff;
+      --spotlight: rgba(0, 0, 0, 0.045);
+      --spotlight-border: rgba(0, 0, 0, 0.35);
+      --glass: rgba(255, 255, 255, 0.72);
+      --status-dot: #16a34a;
+      --accent-warm: #ca8a04;
+      --shadow-card: 0 24px 60px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Circular View Transition wipe for theme switch */
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+
+    ::view-transition-old(root) {
+      z-index: 1;
+    }
+
+    ::view-transition-new(root) {
+      z-index: 9999;
     }
 
     * {
@@ -30,65 +95,172 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      line-height: 1.6;
-      padding: 2rem 1rem;
-      max-width: 640px;
-      margin: 0 auto;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.7;
+      position: relative;
+      transition: background-color 0.35s ease, color 0.35s ease;
     }
 
-    /* テーマコントロールエリア */
-    .theme-controls {
+    ::selection {
+      background: var(--inv-bg);
+      color: var(--inv-text);
+    }
+
+    /* Scroll progress bar */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--text);
+      transform-origin: left center;
+      transform: scaleX(0);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    /* Desktop subtle cursor halo */
+    .cursor-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(circle, var(--spotlight) 0%, transparent 70%);
+      transform: translate3d(-50%, -50%, 0);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      will-change: transform;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .cursor-glow.is-active {
+        opacity: 1;
+      }
+    }
+
+    /* Floating Top Bar */
+    .topbar {
+      position: fixed;
+      top: 1.15rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(1120px, calc(100% - 2rem));
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.4rem;
-      margin-bottom: 1.5rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.6rem 0.75rem 0.6rem 1.1rem;
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      z-index: 200;
+      transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .theme-btn {
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    .topbar.is-scrolled {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-card);
     }
 
-    .theme-btn:hover:not(:disabled) {
-      border-color: var(--accent-color);
-    }
-
-    /* 自動モード時は手動ボタンを少し薄くして無効化 */
-    .theme-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    /* ちっちゃいスイッチの装飾 */
-    .auto-switch-label {
+    .brand-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--status-dot);
+      box-shadow: 0 0 12px var(--status-dot);
+      animation: pulse-dot 2.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.8); }
+    }
+
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+    }
+
+    .topbar-nav a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+    }
+
+    .topbar-nav a:hover {
+      color: var(--text);
+    }
+
+    .theme-dock {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .auto-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
       cursor: pointer;
       user-select: none;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .auto-pill:hover {
+      border-color: var(--border-strong);
+      color: var(--text);
     }
 
     .auto-switch {
       appearance: none;
-      width: 28px;
-      height: 16px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
+      width: 26px;
+      height: 14px;
       border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: transparent;
       position: relative;
       cursor: pointer;
       transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -97,245 +269,2331 @@
     .auto-switch::after {
       content: "";
       position: absolute;
-      top: 2px;
+      top: 1.5px;
       left: 2px;
-      width: 10px;
-      height: 10px;
-      background-color: var(--text-muted);
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
-      transition: transform 0.2s ease, background-color 0.2s ease;
+      background: var(--text-secondary);
+      transition: transform 0.25s var(--ease-out-expo), background-color 0.2s ease;
     }
 
     .auto-switch:checked {
-      background-color: var(--accent-color);
-      border-color: var(--accent-color);
+      background: var(--inv-bg);
+      border-color: var(--inv-bg);
     }
 
     .auto-switch:checked::after {
-      transform: translateX(12px);
-      background-color: #ffffff;
+      transform: translateX(11px);
+      background: var(--inv-text);
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-
-    .avatar {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      background-color: var(--card-bg);
-      border: 2px solid var(--accent-color);
-      margin: 0 auto 1rem;
-      display: flex;
+    .theme-btn {
+      display: inline-flex;
       align-items: center;
+      gap: 0.45rem;
+      height: 32px;
+      padding: 0 0.85rem;
+      border-radius: 999px;
+      border: 1px solid var(--inv-bg);
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform 0.2s var(--ease-out-expo), opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .theme-btn:hover:not(:disabled) {
+      transform: scale(1.04);
+    }
+
+    .theme-btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    .theme-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .theme-btn svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ========================================
+       HERO SECTION (FULL VIEWPORT MONOLITH)
+    ======================================== */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
       justify-content: center;
-      font-size: 2.5rem;
-      object-fit: cover;
+      align-items: center;
+      padding: 6.5rem 1.5rem 3rem;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
     }
 
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 0.3rem;
+    #kinetic-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
     }
 
-    .tagline {
+    /* Giant kinetic ghost wordmark behind hero */
+    .hero-ghost {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(5.5rem, 19vw, 18rem);
+      line-height: 0.85;
+      letter-spacing: -0.05em;
+      white-space: nowrap;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--border);
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+      will-change: transform;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      width: min(1040px, 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.65rem;
+      padding: 0.42rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 2.2rem;
+      animation: hero-enter 0.9s var(--ease-out-expo) both;
+    }
+
+    .hero-eyebrow .sep {
+      opacity: 0.35;
+    }
+
+    /* Pixel Art Toothpick Avatar Stage */
+    .avatar-stage {
+      position: relative;
+      margin-bottom: 2rem;
+      animation: hero-enter 1s var(--ease-out-expo) 0.08s both;
+    }
+
+    .avatar-btn {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      border-radius: 28px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      padding: 14px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.35s var(--ease-out-expo), border-color 0.25s ease, box-shadow 0.35s ease;
+      overflow: hidden;
+    }
+
+    .avatar-btn::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: conic-gradient(from 180deg at 50% 50%, transparent 0deg, var(--text) 60deg, transparent 140deg);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      z-index: 0;
+    }
+
+    .avatar-btn::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 27px;
+      background: var(--surface);
+      z-index: 1;
+    }
+
+    .avatar-btn:hover {
+      transform: translateY(-6px) rotate(-3deg) scale(1.04);
+      border-color: var(--text);
+    }
+
+    .avatar-btn:hover::before {
+      opacity: 0.55;
+      animation: spin-border 3s linear infinite;
+    }
+
+    .avatar-btn.is-popping {
+      transform: scale(0.88) rotate(12deg);
+    }
+
+    @keyframes spin-border {
+      to { transform: rotate(360deg); }
+    }
+
+    .avatar-img {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      transition: transform 0.35s var(--ease-out-expo);
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+    }
+
+    .avatar-btn:hover .avatar-img {
+      transform: scale(1.12) rotate(6deg);
+    }
+
+    .avatar-hint {
+      position: absolute;
+      bottom: -26px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
-      font-size: 0.95rem;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
     }
 
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
+    .avatar-stage:hover .avatar-hint,
+    .avatar-hint.is-shown {
+      opacity: 1;
+      transform: translateX(-50%) translateY(2px);
     }
 
-    h2 {
-      font-size: 1.1rem;
-      color: var(--accent-color);
-      margin-bottom: 1.0rem;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.5rem;
+    .hero-title {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: clamp(3.2rem, 11vw, 7.6rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.1rem;
+      animation: hero-enter 1s var(--ease-out-expo) 0.16s both;
     }
 
-    .tags {
+    .hero-tagline {
+      font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      margin-bottom: 2.6rem;
+      min-height: 2em;
+      animation: hero-enter 1s var(--ease-out-expo) 0.24s both;
+    }
+
+    .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      justify-content: center;
+      gap: 0.9rem;
+      animation: hero-enter 1s var(--ease-out-expo) 0.32s both;
     }
 
-    .tag {
-      background-color: var(--bg-color);
-      border: 1px solid var(--border-color);
-      padding: 0.3rem 0.8rem;
+    .cta-primary,
+    .cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.9rem 1.7rem;
       border-radius: 999px;
-      font-size: 0.85rem;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: transform 0.28s var(--ease-out-expo), background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
     }
 
-    .links {
+    .cta-primary {
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      border: 1px solid var(--inv-bg);
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-3px);
+    }
+
+    .cta-secondary {
+      background: var(--glass);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      backdrop-filter: blur(12px);
+    }
+
+    .cta-secondary:hover {
+      border-color: var(--text);
+      transform: translateY(-3px);
+    }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 1.6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.55rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      animation: hero-enter 1.1s var(--ease-out-expo) 0.45s both;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 36px;
+      background: linear-gradient(to bottom, var(--text), transparent);
+      animation: scroll-pulse 2s var(--ease-out-expo) infinite;
+      transform-origin: top center;
+    }
+
+    @keyframes scroll-pulse {
+      0% { transform: scaleY(0); opacity: 0; }
+      45% { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(0); transform-origin: bottom center; opacity: 0; }
+    }
+
+    @keyframes hero-enter {
+      from {
+        opacity: 0;
+        transform: translateY(32px);
+        filter: blur(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    /* ========================================
+       INFINITE KINETIC MARQUEE
+    ======================================== */
+    .marquee-wrap {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      padding: 0.95rem 0;
+      user-select: none;
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee-scroll 28s linear infinite;
+    }
+
+    .marquee-wrap:hover .marquee-track {
+      animation-play-state: paused;
+    }
+
+    .marquee-group {
+      display: flex;
+      align-items: center;
+      gap: 2.2rem;
+      padding-right: 2.2rem;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .marquee-sep {
+      opacity: 0.4;
+      font-family: var(--font-mono);
+    }
+
+    @keyframes marquee-scroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ========================================
+       MAIN CONTENT & SCROLL REVEAL ENGINE
+    ======================================== */
+    main {
+      position: relative;
+      z-index: 2;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 6rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 7rem;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2.2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-index {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+
+    /* Smooth Floating Scroll Reveal */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(52px) scale(0.965);
+      filter: blur(8px);
+      transition:
+        opacity 0.95s var(--ease-out-expo),
+        transform 0.95s var(--ease-out-expo),
+        filter 0.95s var(--ease-out-expo);
+      transition-delay: calc(var(--delay, 0) * 90ms);
+      will-change: opacity, transform, filter;
+    }
+
+    [data-reveal].is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+
+    /* ========================================
+       BENTO CARDS WITH SPOTLIGHT GLOW
+    ======================================== */
+    .bento-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.25rem;
+    }
+
+    .bento-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      overflow: hidden;
+      transition:
+        border-color 0.35s ease,
+        background-color 0.35s ease,
+        transform 0.45s var(--ease-out-expo),
+        box-shadow 0.45s var(--ease-out-expo);
+      --mx: 50%;
+      --my: 50%;
+    }
+
+    .bento-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(460px circle at var(--mx) var(--my), var(--spotlight), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    .bento-card:hover {
+      border-color: var(--border-strong);
+      background: var(--surface-hover);
+      box-shadow: var(--shadow-card);
+    }
+
+    .bento-card:hover::before {
+      opacity: 1;
+    }
+
+    .bento-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-7 { grid-column: span 7; }
+    .span-6 { grid-column: span 6; }
+    .span-5 { grid-column: span 5; }
+    .span-4 { grid-column: span 4; }
+
+    .card-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .about-lead {
+      font-size: clamp(1.35rem, 2.8vw, 2rem);
+      font-weight: 700;
+      line-height: 1.45;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.3rem;
+    }
+
+    .about-body {
+      font-size: 0.98rem;
+      color: var(--text-secondary);
+      line-height: 1.9;
+    }
+
+    .vibe-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.6rem;
+      padding: 0.45rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Telemetry / Live Status Card */
+    .telemetry-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px dashed var(--border);
+      gap: 1rem;
+    }
+
+    .telemetry-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .telemetry-key {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .telemetry-val {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .quote-box {
+      margin-top: 1.5rem;
+      padding: 1rem 1.1rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 0.8rem;
     }
 
-    .link-btn {
-      display: block;
-      text-align: center;
-      text-decoration: none;
-      color: var(--text-color);
-      background-color: var(--bg-color);
-      border: 1px solid var(--border-color);
-      padding: 0.7rem;
-      border-radius: 8px;
-      font-weight: bold;
-      transition: all 0.2s ease;
+    .quote-text {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
     }
 
-    .link-btn:hover {
-      border-color: var(--accent-color);
-      color: var(--accent-color);
-      transform: translateY(-2px);
+    .mini-btn {
+      flex-shrink: 0;
+      border: 1px solid var(--border-strong);
+      background: transparent;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
-    footer {
-      text-align: center;
+    .mini-btn:hover {
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      transform: scale(1.05);
+    }
+
+    /* Skills & Interests Bento */
+    .skill-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      margin-top: 0.5rem;
+    }
+
+    .skill-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.65rem 1.05rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.25s var(--ease-out-expo), border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .skill-pill:hover,
+    .skill-pill.is-selected {
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      border-color: var(--inv-bg);
+      transform: translateY(-3px);
+    }
+
+    .skill-note {
+      margin-top: 1.4rem;
+      min-height: 1.6em;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    /* Equalizer / Music Card */
+    .music-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .eq-stage {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 68px;
+      margin: 1.2rem 0 1.4rem;
+    }
+
+    .eq-bar {
+      flex: 1;
+      border-radius: 999px;
+      background: var(--text);
+      height: 18%;
+      opacity: 0.32;
+      animation: eq-idle 1.8s ease-in-out infinite alternate;
+      transition: opacity 0.3s ease;
+    }
+
+    .music-card:hover .eq-bar,
+    .music-card.is-playing .eq-bar {
+      opacity: 0.95;
+      animation-name: eq-bounce;
+      animation-duration: 0.65s;
+    }
+
+    .eq-bar:nth-child(2) { animation-delay: 0.12s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.28s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.08s; }
+    .eq-bar:nth-child(5) { animation-delay: 0.34s; }
+    .eq-bar:nth-child(6) { animation-delay: 0.18s; }
+    .eq-bar:nth-child(7) { animation-delay: 0.42s; }
+    .eq-bar:nth-child(8) { animation-delay: 0.22s; }
+    .eq-bar:nth-child(9) { animation-delay: 0.05s; }
+    .eq-bar:nth-child(10) { animation-delay: 0.3s; }
+
+    @keyframes eq-idle {
+      from { height: 14%; }
+      to { height: 42%; }
+    }
+
+    @keyframes eq-bounce {
+      0% { height: 18%; }
+      50% { height: 96%; }
+      100% { height: 34%; }
+    }
+
+    .card-title-lg {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .sound-state {
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
-      font-size: 0.8rem;
-      margin-top: 3rem;
+    }
+
+    .music-card.is-playing .sound-state {
+      color: var(--text);
+    }
+
+    /* Game Card */
+    .game-visual {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+
+    .pixel-dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 14px);
+      grid-template-rows: repeat(3, 14px);
+      gap: 3px;
+    }
+
+    .pixel-dpad span {
+      border-radius: 3px;
+      background: transparent;
+    }
+
+    .pixel-dpad span.on {
+      background: var(--text);
+      opacity: 0.85;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .bento-card:hover .pixel-dpad span.on {
+      opacity: 1;
+    }
+
+    /* GitHub Works Grid */
+    .repos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .repo-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 205px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .repo-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .repo-name {
+      font-family: var(--font-mono);
+      font-size: 1.08rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .repo-arrow {
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      transition: transform 0.3s var(--ease-out-expo), color 0.2s ease;
+    }
+
+    .repo-card:hover .repo-arrow {
+      transform: translate(4px, -4px);
+      color: var(--text);
+    }
+
+    .repo-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      line-height: 1.65;
+    }
+
+    .repo-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    .repo-lang {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--text-secondary);
+    }
+
+    .lang-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text);
+    }
+
+    .repo-skeleton {
+      min-height: 205px;
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hover) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s infinite linear;
+    }
+
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+
+    /* Connect Monolith Links */
+    .connect-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .connect-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.2rem;
+      text-decoration: none;
+      color: var(--text);
+      padding: 1.85rem 1.85rem;
+    }
+
+    .connect-card.is-featured {
+      grid-column: 1 / -1;
+      padding: 2.35rem 2.2rem;
+      border-color: var(--border-strong);
+    }
+
+    .connect-card:hover {
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      border-color: var(--inv-bg);
+      transform: translateY(-5px);
+    }
+
+    .connect-card:hover .connect-handle,
+    .connect-card:hover .connect-arrow {
+      color: var(--inv-text);
+    }
+
+    .connect-card:hover .connect-badge {
+      border-color: currentColor;
+      color: var(--inv-text);
+    }
+
+    .connect-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+    }
+
+    .connect-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      transition: color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .connect-left {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .connect-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid var(--border-strong);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: border-color 0.25s ease, transform 0.35s var(--ease-out-expo);
+    }
+
+    .connect-card:hover .connect-icon {
+      border-color: currentColor;
+      transform: rotate(-6deg) scale(1.06);
+    }
+
+    .connect-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .connect-name {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .connect-handle {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+      transition: color 0.25s ease;
+    }
+
+    .connect-arrow {
+      font-family: var(--font-mono);
+      font-size: 1.8rem;
+      color: var(--text-muted);
+      transition: transform 0.35s var(--ease-out-expo), color 0.25s ease;
+    }
+
+    .connect-card:hover .connect-arrow {
+      transform: translate(6px, -6px);
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 2;
+      margin-top: 6rem;
+      border-top: 1px solid var(--border);
+      padding: 4rem 1.5rem 2.5rem;
+      overflow: hidden;
+    }
+
+    .footer-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .footer-wordmark {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(2.8rem, 11vw, 8.8rem);
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+      text-align: center;
+      user-select: none;
+      opacity: 0.14;
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .kbd-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text);
+    }
+
+    .back-top {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .back-top:hover {
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      border-color: var(--inv-bg);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 1.6rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--inv-bg);
+      color: var(--inv-text);
+      padding: 0.65rem 1.25rem;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1500;
+      transition: opacity 0.3s ease, transform 0.35s var(--ease-out-expo);
+      box-shadow: var(--shadow-card);
+    }
+
+    .toast.is-open {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Easter Egg Burst Canvas */
+    #burst-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1200;
+    }
+
+    @keyframes storm-shake {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      15% { transform: translate3d(-6px, 4px, 0); }
+      30% { transform: translate3d(6px, -4px, 0); }
+      45% { transform: translate3d(-4px, -3px, 0); }
+      60% { transform: translate3d(4px, 3px, 0); }
+      75% { transform: translate3d(-2px, 2px, 0); }
+    }
+
+    .is-storm-shake {
+      animation: storm-shake 0.42s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .topbar-nav {
+        display: none;
+      }
+
+      .span-8, .span-7, .span-6, .span-5, .span-4 {
+        grid-column: span 12;
+      }
+
+      .repos-grid,
+      .connect-grid {
+        grid-template-columns: 1fr;
+      }
+
+      main {
+        padding: 4.5rem 1.15rem 3rem;
+        gap: 5rem;
+      }
+
+      .bento-card {
+        padding: 1.6rem;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .topbar {
+        padding: 0.5rem 0.6rem 0.5rem 0.9rem;
+      }
+
+      .auto-pill span {
+        display: none;
+      }
+
+      .theme-btn span {
+        display: none;
+      }
+
+      .theme-btn {
+        padding: 0 0.65rem;
+      }
+
+      .connect-card {
+        padding: 1.6rem 1.4rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+      }
     }
   </style>
 </head>
 
-<body>
+<body id="top">
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+  <canvas id="burst-canvas" aria-hidden="true"></canvas>
 
-  <div class="theme-controls">
-    <button id="theme-toggle" class="theme-btn">ライト/ダークモード切替</button>
-    <label class="auto-switch-label">
-      <span id="auto-switch-text">前回のモードを保持する</span>
-      <input type="checkbox" id="auto-theme-switch" class="auto-switch">
-    </label>
-  </div>
+  <!-- Floating Navigation & Theme Dock -->
+  <header class="topbar" id="topbar">
+    <a href="#top" class="brand-link">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span>tumayouzi_Dev</span>
+    </a>
 
-  <header>
-    <img src="makebead-256x256.png" alt="アイコン" class="avatar">
-    <h1>つまよーじ</h1>
-    <p class="tagline">Web開発に人生を捧げた</p>
+    <nav class="topbar-nav" aria-label="セクション移動">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#works">Works</a>
+      <a href="#connect">Connect</a>
+    </nav>
+
+    <div class="theme-dock">
+      <label class="auto-pill" title="OSのテーマに自動追従するか切り替え">
+        <span id="auto-switch-text">AUTO</span>
+        <input type="checkbox" id="auto-theme-switch" class="auto-switch" aria-label="システムに応じて自動で切り替える">
+      </label>
+
+      <button id="theme-toggle" class="theme-btn" type="button" aria-label="ライト・ダークモード切替">
+        <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+        <span id="theme-label">DARK</span>
+      </button>
+    </div>
   </header>
 
-  <main>
-    <section class="card">
-      <h2>About Me</h2>
-      <p>
-        はじめまして、プログラミングやものづくりに興味があって、このページを作りました。
-        最近はHTML/CSSやJavaScriptを触りながら、作ったものをVercelで公開して遊んでいます。
-      </p>
-    </section>
+  <!-- Full-Viewport Interactive Hero -->
+  <section class="hero" id="hero">
+    <canvas id="kinetic-canvas" aria-hidden="true"></canvas>
+    <div class="hero-ghost" id="hero-ghost" aria-hidden="true">TUMAYOUZI</div>
 
-    <section class="card">
-      <h2>Skills & Interests</h2>
-      <div class="tags">
-        <span class="tag">HTML / CSS</span>
-        <span class="tag">JavaScript</span>
-        <span class="tag">GitHub</span>
-        <span class="tag">ゲーム</span>
-        <span class="tag">音楽鑑賞</span>
+    <div class="hero-inner">
+      <div class="hero-eyebrow">
+        <span>PORTFOLIO // 2026</span>
+        <span class="sep">/</span>
+        <span>TOKYO JST <strong id="hero-clock">--:--:--</strong></span>
+      </div>
+
+      <div class="avatar-stage">
+        <button type="button" class="avatar-btn" id="avatar-btn" aria-label="つまよーじアイコン（連打すると何かが起きる）">
+          <img src="makebead-256x256.png" alt="つまよーじのドット絵アイコン" class="avatar-img">
+        </button>
+        <span class="avatar-hint" id="avatar-hint">CLICK ME</span>
+      </div>
+
+      <h1 class="hero-title">つまよーじ</h1>
+      <p class="hero-tagline" id="hero-tagline" data-text="Web開発に人生を捧げた">Web開発に人生を捧げた</p>
+
+      <div class="hero-actions">
+        <a href="#about" class="cta-primary">
+          <span>EXPLORE</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+        <a href="https://github.com/8mykg" target="_blank" rel="noopener noreferrer" class="cta-secondary">
+          <span>GITHUB @8mykg</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <a href="#about" class="scroll-cue" aria-label="下へスクロール">
+      <span>Scroll</span>
+      <span class="scroll-line" aria-hidden="true"></span>
+    </a>
+  </section>
+
+  <!-- High-Contrast Infinite Marquee -->
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="marquee-group">
+        <span>HTML5 / CSS3</span><span class="marquee-sep">✦</span>
+        <span>JAVASCRIPT</span><span class="marquee-sep">✦</span>
+        <span>GITHUB</span><span class="marquee-sep">✦</span>
+        <span>VERCEL</span><span class="marquee-sep">✦</span>
+        <span>SUPABASE</span><span class="marquee-sep">✦</span>
+        <span>VIBES CODING</span><span class="marquee-sep">✦</span>
+        <span>GAME</span><span class="marquee-sep">✦</span>
+        <span>MUSIC</span><span class="marquee-sep">✦</span>
+        <span>勢いとノリ</span><span class="marquee-sep">✦</span>
+      </div>
+      <div class="marquee-group">
+        <span>HTML5 / CSS3</span><span class="marquee-sep">✦</span>
+        <span>JAVASCRIPT</span><span class="marquee-sep">✦</span>
+        <span>GITHUB</span><span class="marquee-sep">✦</span>
+        <span>VERCEL</span><span class="marquee-sep">✦</span>
+        <span>SUPABASE</span><span class="marquee-sep">✦</span>
+        <span>VIBES CODING</span><span class="marquee-sep">✦</span>
+        <span>GAME</span><span class="marquee-sep">✦</span>
+        <span>MUSIC</span><span class="marquee-sep">✦</span>
+        <span>勢いとノリ</span><span class="marquee-sep">✦</span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- 01 / ABOUT -->
+    <section id="about">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">About Me</h2>
+        <span class="section-index">01 / PROFILE</span>
+      </div>
+
+      <div class="bento-grid">
+        <article class="bento-card span-7" data-reveal style="--delay: 0">
+          <div class="card-kicker">01.A — INTRODUCTION</div>
+          <p class="about-lead">
+            つくるのが好き。<br>
+            コードとノリで、画面を動かす。
+          </p>
+          <p class="about-body">
+            はじめまして、プログラミングやものづくりに興味があって、このページを作りました。
+            最近は HTML/CSS や JavaScript を触りながら、作ったものを Vercel で公開して遊んでいます。
+          </p>
+          <div class="vibe-badge">
+            <span>⚡</span>
+            <span>Stack: HTML5 / CSS3 / JS / Supabase / 勢いとノリ</span>
+          </div>
+        </article>
+
+        <aside class="bento-card span-5" data-reveal style="--delay: 1">
+          <div class="card-kicker">01.B — LIVE STATUS</div>
+          <div class="telemetry-list">
+            <div class="telemetry-row">
+              <span class="telemetry-key">Handle</span>
+              <span class="telemetry-val">@8mykg</span>
+            </div>
+            <div class="telemetry-row">
+              <span class="telemetry-key">Deploy</span>
+              <span class="telemetry-val">Vercel / GitHub</span>
+            </div>
+            <div class="telemetry-row">
+              <span class="telemetry-key">Database</span>
+              <span class="telemetry-val">Supabase</span>
+            </div>
+            <div class="telemetry-row">
+              <span class="telemetry-key">Mode</span>
+              <span class="telemetry-val" id="telemetry-theme">PITCH BLACK</span>
+            </div>
+            <div class="telemetry-row">
+              <span class="telemetry-key">Local Time</span>
+              <span class="telemetry-val" id="telemetry-clock">--:--:--</span>
+            </div>
+          </div>
+
+          <div class="quote-box">
+            <span class="quote-text" id="vibe-quote">あれもこれもバイブスコーディング。</span>
+            <button type="button" class="mini-btn" id="shuffle-quote">SHUFFLE</button>
+          </div>
+        </aside>
       </div>
     </section>
 
-    <section class="card">
-      <h2>Links</h2>
-      <div class="links">
-        <a href="https://github.com/8mykg" target="_blank" class="link-btn">GitHub</a>
-        <a href="https://x.com/fafogame5" target="_blank" class="link-btn">X (Twitter)</a>
+    <!-- 02 / SKILLS & INTERESTS -->
+    <section id="skills">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Skills &amp; Interests</h2>
+        <span class="section-index">02 / STACK &amp; VIBES</span>
+      </div>
+
+      <div class="bento-grid">
+        <article class="bento-card span-12" data-reveal style="--delay: 0">
+          <div class="card-kicker">02.A — CORE STACK (CLICK TO INSPECT)</div>
+          <div class="skill-pills" id="skill-pills">
+            <button type="button" class="skill-pill is-selected" data-note="真っ黒も真っ白も自由自在。CSSアニメーションで遊ぶのが楽しい。">HTML / CSS</button>
+            <button type="button" class="skill-pill" data-note="動きとギミックの心臓部。Canvasもスクロール演出もぜんぶJS。">JavaScript</button>
+            <button type="button" class="skill-pill" data-note="再再再再再再デプロイの記憶が刻まれた頼れる相棒。">GitHub</button>
+            <button type="button" class="skill-pill" data-note="作ったらすぐ世界に公開できる最高の遊び場。">Vercel</button>
+            <button type="button" class="skill-pill" data-note="自作SNSの裏側も支えるDB。リアルタイムも認証もおまかせ。">Supabase</button>
+            <button type="button" class="skill-pill" data-note="最重要フレームワーク。これが無いと何も始まらない。">勢いとノリ</button>
+          </div>
+          <p class="skill-note" id="skill-note">→ 真っ黒も真っ白も自由自在。CSSアニメーションで遊ぶのが楽しい。</p>
+        </article>
+
+        <article class="bento-card span-6" data-reveal style="--delay: 1">
+          <div class="game-visual">
+            <div class="card-kicker" style="margin-bottom:0">02.B — INTEREST</div>
+            <div class="pixel-dpad" aria-hidden="true">
+              <span></span><span class="on"></span><span></span>
+              <span class="on"></span><span class="on"></span><span class="on"></span>
+              <span></span><span class="on"></span><span></span>
+            </div>
+          </div>
+          <h3 class="card-title-lg">ゲーム</h3>
+          <p class="card-desc">
+            遊びのアイデアやUIの手触りのヒントはだいたいゲームから。ドット絵アイコンのルーツもここ。
+          </p>
+        </article>
+
+        <article class="bento-card span-6 music-card" id="music-card" data-reveal style="--delay: 2" role="button" tabindex="0" aria-pressed="false">
+          <div>
+            <div class="card-kicker">02.C — INTEREST (CLICK FOR AMBIENT)</div>
+            <div class="eq-stage" aria-hidden="true">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+          </div>
+          <div>
+            <h3 class="card-title-lg">音楽鑑賞</h3>
+            <p class="card-desc">
+              コードを書くときもぼーっとするときも音は必須。クリックすると静かな環境音が鳴ります。
+            </p>
+            <div class="sound-state" id="sound-state">● SYNTH: OFF</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 03 / GITHUB WORKS -->
+    <section id="works">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Latest Works</h2>
+        <span class="section-index">03 / GITHUB LIVE FEED</span>
+      </div>
+
+      <div class="repos-grid" id="repos-grid">
+        <div class="bento-card repo-skeleton" data-reveal style="--delay: 0"></div>
+        <div class="bento-card repo-skeleton" data-reveal style="--delay: 1"></div>
+      </div>
+    </section>
+
+    <!-- 04 / CONNECT -->
+    <section id="connect">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Connect</h2>
+        <span class="section-index">04 / SNS GATEKEEPER · 7 LINKS</span>
+      </div>
+
+      <div class="connect-grid">
+        <!-- Featured: My Own SNS (Origo) -->
+        <a href="https://origo-sns-beta.vercel.app/profile/8mykg" target="_blank" rel="noopener noreferrer" class="bento-card connect-card is-featured" data-reveal style="--delay: 0">
+          <div class="connect-left">
+            <div class="connect-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill:none">
+                <circle cx="12" cy="12" r="9"></circle>
+                <circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"></circle>
+                <path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="connect-title-row">
+                <span class="connect-name">Origo</span>
+                <span class="connect-badge">MY OWN SNS · BETA</span>
+              </div>
+              <div class="connect-handle">origo-sns-beta.vercel.app/profile/8mykg — 自作SNS</div>
+            </div>
+          </div>
+          <span class="connect-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- GitHub -->
+        <a href="https://github.com/8mykg" target="_blank" rel="noopener noreferrer" class="bento-card connect-card" data-reveal style="--delay: 0">
+          <div class="connect-left">
+            <div class="connect-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.16c-3.2.7-3.87-1.35-3.87-1.35-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.16 1.18a10.9 10.9 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.58.23 2.75.12 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.26 5.67.42.36.79 1.07.79 2.16v3.2c0 .31.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>
+            </div>
+            <div>
+              <div class="connect-name">GitHub</div>
+              <div class="connect-handle">github.com/8mykg</div>
+            </div>
+          </div>
+          <span class="connect-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- X (Twitter) -->
+        <a href="https://x.com/fafogame5" target="_blank" rel="noopener noreferrer" class="bento-card connect-card" data-reveal style="--delay: 1">
+          <div class="connect-left">
+            <div class="connect-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg>
+            </div>
+            <div>
+              <div class="connect-name">X (Twitter)</div>
+              <div class="connect-handle">@fafogame5</div>
+            </div>
+          </div>
+          <span class="connect-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- YouTube -->
+        <a href="https://www.youtube.com/@8mykg" target="_blank" rel="noopener noreferrer" class="bento-card connect-card" data-reveal style="--delay: 0">
+          <div class="connect-left">
+            <div class="connect-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14c1.88.56 9.38.56 9.38.56s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+            </div>
+            <div>
+              <div class="connect-name">YouTube</div>
+              <div class="connect-handle">@8mykg</div>
+            </div>
+          </div>
+          <span class="connect-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- Discord Server -->
+        <a href="https://discord.gg/hV2vvHx8BM" target="_blank" rel="noopener noreferrer" class="bento-card connect-card" data-reveal style="--delay: 1">
+          <div class="connect-left">
+            <div class="connect-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.52.07.07 0 0 0-.08.04c-.21.38-.45.87-.61 1.25a18.3 18.3 0 0 0-5.49 0 12.6 12.6 0 0 0-.62-1.25.08.08 0 0 0-.08-.04A19.7 19.7 0 0 0 3.67 4.37a.07.07 0 0 0-.03.03C.53 9.05-.32 13.58.1 18.06a.08.08 0 0 0 .03.06 19.9 19.9 0 0 0 6 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.23-2a.08.08 0 0 0-.04-.11 13.1 13.1 0 0 1-1.87-.89.08.08 0 0 1-.01-.13c.13-.09.25-.19.37-.29a.08.08 0 0 1 .08-.01c3.93 1.79 8.18 1.79 12.06 0a.08.08 0 0 1 .08.01c.12.1.25.2.37.29a.08.08 0 0 1-.01.13c-.6.35-1.22.65-1.87.89a.08.08 0 0 0-.04.11c.36.7.77 1.37 1.23 2a.08.08 0 0 0 .08.03 19.8 19.8 0 0 0 6-3.03.08.08 0 0 0 .03-.06c.5-5.18-.84-9.68-3.55-13.66a.06.06 0 0 0-.03-.03ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.95 2.42-2.16 2.42Z"/></svg>
+            </div>
+            <div>
+              <div class="connect-title-row">
+                <span class="connect-name">Discord</span>
+                <span class="connect-badge">MY SERVER</span>
+              </div>
+              <div class="connect-handle">discord.gg/hV2vvHx8BM</div>
+            </div>
+          </div>
+          <span class="connect-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- Reddit -->
+        <a href="https://www.reddit.com/user/8mykg/" target="_blank" rel="noopener noreferrer" class="bento-card connect-card" data-reveal style="--delay: 0">
+          <div class="connect-left">
+            <div class="connect-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0Zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.11 3.11 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701ZM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249Zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249Zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095Z"/></svg>
+            </div>
+            <div>
+              <div class="connect-name">Reddit</div>
+              <div class="connect-handle">u/8mykg</div>
+            </div>
+          </div>
+          <span class="connect-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- susm.site (Friend's Indie SNS) -->
+        <a href="https://susm.site/profile/8mykg" target="_blank" rel="noopener noreferrer" class="bento-card connect-card" data-reveal style="--delay: 1">
+          <div class="connect-left">
+            <div class="connect-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill:none">
+                <circle cx="6" cy="12" r="2.5"></circle>
+                <circle cx="18" cy="6" r="2.5"></circle>
+                <circle cx="18" cy="18" r="2.5"></circle>
+                <path d="M8.3 10.9 15.7 7.1M8.3 13.1l7.4 3.8"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="connect-title-row">
+                <span class="connect-name">susm.site</span>
+                <span class="connect-badge">FRIEND'S SNS</span>
+              </div>
+              <div class="connect-handle">susm.site/profile/8mykg</div>
+            </div>
+          </div>
+          <span class="connect-arrow" aria-hidden="true">↗</span>
+        </a>
       </div>
     </section>
   </main>
 
   <footer>
-    &copy; Copyright 2026 tumayouzi_Dev.All rights reserved.
+    <div class="footer-inner">
+      <div class="footer-wordmark" data-reveal>TUMAYOUZI</div>
+      <div class="footer-bottom">
+        <span>&copy; Copyright 2026 tumayouzi_Dev. All rights reserved.</span>
+        <span class="kbd-hint">Press <kbd>D</kbd> to invert reality</span>
+        <a href="#top" class="back-top">BACK TO TOP ↑</a>
+      </div>
+    </div>
   </footer>
 
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <script>
-    const toggleBtn = document.getElementById('theme-toggle');
-    const autoSwitch = document.getElementById('auto-theme-switch');
-    const autoSwitchText = document.getElementById('auto-switch-text');
-    const htmlElement = document.documentElement;
-    const osLightQuery = window.matchMedia('(prefers-color-scheme: light)');
+    (() => {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const htmlEl = document.documentElement;
+      const osLightQuery = window.matchMedia('(prefers-color-scheme: light)');
 
-    // テーマを画面に反映する関数
-    const applyTheme = (theme) => {
-      if (theme === 'light') {
-        htmlElement.setAttribute('data-theme', 'light');
-      } else {
-        htmlElement.removeAttribute('data-theme');
+      /* ==================================================
+         1. TOAST HELPER
+      ================================================== */
+      const toastEl = document.getElementById('toast');
+      let toastTimer = null;
+      const showToast = (msg) => {
+        toastEl.textContent = msg;
+        toastEl.classList.add('is-open');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('is-open'), 2200);
+      };
+
+      /* ==================================================
+         2. THEME SYSTEM (PURE BLACK #000 <-> PURE WHITE #FFF)
+            with View Transitions circular wipe & OS Auto mode
+      ================================================== */
+      const toggleBtn = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const themeLabel = document.getElementById('theme-label');
+      const autoSwitch = document.getElementById('auto-theme-switch');
+      const autoSwitchText = document.getElementById('auto-switch-text');
+      const telemetryTheme = document.getElementById('telemetry-theme');
+
+      const SUN_SVG = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>';
+      const MOON_SVG = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+
+      const getCurrentTheme = () =>
+        htmlEl.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+
+      const applyTheme = (theme) => {
+        if (theme === 'light') {
+          htmlEl.setAttribute('data-theme', 'light');
+          themeIcon.innerHTML = SUN_SVG;
+          themeLabel.textContent = 'WHITE';
+          if (telemetryTheme) telemetryTheme.textContent = 'PURE WHITE';
+        } else {
+          htmlEl.removeAttribute('data-theme');
+          themeIcon.innerHTML = MOON_SVG;
+          themeLabel.textContent = 'BLACK';
+          if (telemetryTheme) telemetryTheme.textContent = 'PITCH BLACK';
+        }
+      };
+
+      const applyThemeWithWipe = (nextTheme, originX, originY) => {
+        if (reducedMotion || typeof document.startViewTransition !== 'function') {
+          applyTheme(nextTheme);
+          return;
+        }
+        const x = originX ?? window.innerWidth / 2;
+        const y = originY ?? window.innerHeight / 2;
+        const maxRadius = Math.hypot(
+          Math.max(x, window.innerWidth - x),
+          Math.max(y, window.innerHeight - y)
+        );
+
+        const transition = document.startViewTransition(() => applyTheme(nextTheme));
+        transition.ready.then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${maxRadius}px at ${x}px ${y}px)`
+              ]
+            },
+            {
+              duration: 580,
+              easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+              pseudoElement: '::view-transition-new(root)'
+            }
+          );
+        }).catch(() => {});
+      };
+
+      const updateControlsUI = (isAuto) => {
+        autoSwitch.checked = isAuto;
+        toggleBtn.disabled = isAuto;
+        autoSwitchText.textContent = isAuto ? 'AUTO' : 'MANUAL';
+      };
+
+      const initTheme = () => {
+        const mode = localStorage.getItem('themeMode') || 'auto';
+        const isAuto = mode === 'auto';
+        updateControlsUI(isAuto);
+
+        if (isAuto) {
+          applyTheme(osLightQuery.matches ? 'light' : 'dark');
+        } else {
+          applyTheme(localStorage.getItem('theme') || 'dark');
+        }
+      };
+
+      autoSwitch.addEventListener('change', (e) => {
+        const isAuto = e.target.checked;
+        updateControlsUI(isAuto);
+        const rect = autoSwitch.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        if (isAuto) {
+          localStorage.setItem('themeMode', 'auto');
+          const osTheme = osLightQuery.matches ? 'light' : 'dark';
+          if (osTheme !== getCurrentTheme()) {
+            applyThemeWithWipe(osTheme, cx, cy);
+          }
+          showToast('THEME: AUTO (OS SYNC)');
+        } else {
+          localStorage.setItem('themeMode', 'manual');
+          localStorage.setItem('theme', getCurrentTheme());
+          showToast('THEME: MANUAL MODE');
+        }
+      });
+
+      const triggerManualToggle = (x, y) => {
+        if (autoSwitch.checked) {
+          // Pressing T while in Auto smoothly switches to Manual and flips
+          localStorage.setItem('themeMode', 'manual');
+          updateControlsUI(false);
+        }
+        const nextTheme = getCurrentTheme() === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', nextTheme);
+        applyThemeWithWipe(nextTheme, x, y);
+      };
+
+      toggleBtn.addEventListener('click', (e) => {
+        if (autoSwitch.checked) return;
+        triggerManualToggle(e.clientX, e.clientY);
+      });
+
+      osLightQuery.addEventListener('change', (e) => {
+        if (autoSwitch.checked) {
+          applyTheme(e.matches ? 'light' : 'dark');
+        }
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.key === 'd' || e.key === 'D') {
+          const rect = toggleBtn.getBoundingClientRect();
+          triggerManualToggle(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+      });
+
+      initTheme();
+
+      /* ==================================================
+         3. LIVE TOKYO CLOCK
+      ================================================== */
+      const heroClock = document.getElementById('hero-clock');
+      const telemetryClock = document.getElementById('telemetry-clock');
+      const timeFmt = new Intl.DateTimeFormat('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+
+      const updateClock = () => {
+        const nowStr = timeFmt.format(new Date());
+        if (heroClock) heroClock.textContent = nowStr;
+        if (telemetryClock) telemetryClock.textContent = `${nowStr} JST`;
+      };
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      /* ==================================================
+         4. SCROLL PROGRESS + TOPBAR + HERO PARALLAX
+      ================================================== */
+      const scrollProgress = document.getElementById('scroll-progress');
+      const topbar = document.getElementById('topbar');
+      const heroGhost = document.getElementById('hero-ghost');
+      let scrollTicking = false;
+
+      const onScroll = () => {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollY / docHeight)) : 0;
+          scrollProgress.style.transform = `scaleX(${progress})`;
+          topbar.classList.toggle('is-scrolled', scrollY > 40);
+
+          if (!reducedMotion && heroGhost && scrollY < window.innerHeight * 1.4) {
+            heroGhost.style.transform = `translate(calc(-50% + ${scrollY * -0.18}px), calc(-50% + ${scrollY * 0.22}px))`;
+          }
+          scrollTicking = false;
+        });
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      /* ==================================================
+         5. INTERSECTION OBSERVER — FLOATING CARD REVEAL
+      ================================================== */
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -36px 0px' }
+      );
+
+      const observeReveals = (root = document) => {
+        root.querySelectorAll('[data-reveal]').forEach((el) => {
+          if (reducedMotion) {
+            el.classList.add('is-visible');
+          } else {
+            revealObserver.observe(el);
+          }
+        });
+      };
+      observeReveals();
+
+      /* ==================================================
+         6. CURSOR GLOW + BENTO CARD SPOTLIGHT TRACKING
+      ================================================== */
+      const cursorGlow = document.getElementById('cursor-glow');
+      const attachCardSpotlight = (card) => {
+        card.addEventListener('pointermove', (e) => {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+          card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+        });
+      };
+      document.querySelectorAll('.bento-card').forEach(attachCardSpotlight);
+
+      if (!reducedMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        window.addEventListener('pointermove', (e) => {
+          cursorGlow.classList.add('is-active');
+          cursorGlow.style.transform = `translate3d(${e.clientX - 210}px, ${e.clientY - 210}px, 0)`;
+        }, { passive: true });
+
+        // Magnetic pull on hero CTA buttons
+        document.querySelectorAll('.cta-primary, .cta-secondary').forEach((el) => {
+          el.addEventListener('pointermove', (e) => {
+            const rect = el.getBoundingClientRect();
+            const dx = (e.clientX - (rect.left + rect.width / 2)) * 0.24;
+            const dy = (e.clientY - (rect.top + rect.height / 2)) * 0.3;
+            el.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0)`;
+          });
+          el.addEventListener('pointerleave', () => {
+            el.style.transform = '';
+          });
+        });
       }
-    };
 
-    // UI（ボタンの有効/無効やテキスト）を現在のモードに合わせて更新する関数
-    const updateControlsUI = (isAuto) => {
-      autoSwitch.checked = isAuto;
-      toggleBtn.disabled = isAuto;
-      autoSwitchText.textContent = isAuto
-        ? 'システムに応じて自動で切り替える'
-        : '前回のモードを保持する';
-    };
+      /* ==================================================
+         7. HERO KINETIC VECTOR FIELD (TOOTHPICK MAGNET FIELD)
+      ================================================== */
+      const kineticCanvas = document.getElementById('kinetic-canvas');
+      const heroSection = document.getElementById('hero');
 
-    // 1. 初期読み込み時のセットアップ
-    const initTheme = () => {
-      const mode = localStorage.getItem('themeMode') || 'auto'; // デフォルトは自動
-      const isAuto = mode === 'auto';
+      if (kineticCanvas && !reducedMotion) {
+        const ctx = kineticCanvas.getContext('2d');
+        let width = 0;
+        let height = 0;
+        let dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let heroVisible = true;
+        const mouse = { x: -9999, y: -9999, active: false };
+        const ripples = [];
 
-      updateControlsUI(isAuto);
+        const resizeCanvas = () => {
+          const rect = heroSection.getBoundingClientRect();
+          width = rect.width;
+          height = rect.height;
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          kineticCanvas.width = Math.floor(width * dpr);
+          kineticCanvas.height = Math.floor(height * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
 
-      if (isAuto) {
-        applyTheme(osLightQuery.matches ? 'light' : 'dark');
-      } else {
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(savedTheme);
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        heroSection.addEventListener('pointermove', (e) => {
+          const rect = heroSection.getBoundingClientRect();
+          mouse.x = e.clientX - rect.left;
+          mouse.y = e.clientY - rect.top;
+          mouse.active = true;
+        });
+
+        heroSection.addEventListener('pointerleave', () => {
+          mouse.active = false;
+        });
+
+        heroSection.addEventListener('click', (e) => {
+          if (e.target.closest('a, button')) return;
+          const rect = heroSection.getBoundingClientRect();
+          ripples.push({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            radius: 0,
+            alpha: 1
+          });
+        });
+
+        const heroVisObserver = new IntersectionObserver((entries) => {
+          heroVisible = entries[0].isIntersecting;
+        }, { threshold: 0.01 });
+        heroVisObserver.observe(heroSection);
+
+        const drawField = (time) => {
+          requestAnimationFrame(drawField);
+          if (!heroVisible) return;
+
+          ctx.clearRect(0, 0, width, height);
+          const isLight = getCurrentTheme() === 'light';
+          const baseRGB = isLight ? '0, 0, 0' : '255, 255, 255';
+          const spacing = width < 640 ? 48 : 56;
+          const cols = Math.ceil(width / spacing) + 1;
+          const rows = Math.ceil(height / spacing) + 1;
+          const t = time * 0.00055;
+
+          // Update shockwave ripples
+          for (let i = ripples.length - 1; i >= 0; i--) {
+            ripples[i].radius += 9;
+            ripples[i].alpha *= 0.965;
+            if (ripples[i].alpha < 0.03) ripples.splice(i, 1);
+          }
+
+          ctx.lineCap = 'round';
+
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              const x = c * spacing;
+              const y = r * spacing;
+
+              // Base smooth flow angle
+              let angle = Math.sin(c * 0.28 + t) * Math.cos(r * 0.28 - t * 0.8) * Math.PI * 0.65;
+              let len = 11;
+              let alpha = isLight ? 0.12 : 0.16;
+
+              // Mouse magnetic attraction
+              if (mouse.active) {
+                const dx = mouse.x - x;
+                const dy = mouse.y - y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 230) {
+                  const strength = 1 - dist / 230;
+                  const targetAngle = Math.atan2(dy, dx);
+                  angle = angle * (1 - strength) + targetAngle * strength;
+                  len += strength * 14;
+                  alpha += strength * (isLight ? 0.52 : 0.62);
+                }
+              }
+
+              // Ripple kick
+              for (const rip of ripples) {
+                const dx = x - rip.x;
+                const dy = y - rip.y;
+                const dist = Math.hypot(dx, dy);
+                const band = Math.abs(dist - rip.radius);
+                if (band < 48) {
+                  const wave = (1 - band / 48) * rip.alpha;
+                  angle += wave * 1.6;
+                  len += wave * 12;
+                  alpha = Math.min(0.95, alpha + wave * 0.65);
+                }
+              }
+
+              const half = len * 0.5;
+              const cosA = Math.cos(angle);
+              const sinA = Math.sin(angle);
+
+              ctx.strokeStyle = `rgba(${baseRGB}, ${alpha.toFixed(3)})`;
+              ctx.lineWidth = len > 18 ? 1.8 : 1.15;
+              ctx.beginPath();
+              ctx.moveTo(x - cosA * half, y - sinA * half);
+              ctx.lineTo(x + cosA * half, y + sinA * half);
+              ctx.stroke();
+            }
+          }
+        };
+
+        requestAnimationFrame(drawField);
       }
-    };
 
-    // 2. スイッチ切り替え時の処理（自動 <-> 前回のモードを保持）
-    autoSwitch.addEventListener('change', (e) => {
-      const isAuto = e.target.checked;
-      updateControlsUI(isAuto);
-
-      if (isAuto) {
-        localStorage.setItem('themeMode', 'auto');
-        applyTheme(osLightQuery.matches ? 'light' : 'dark');
-      } else {
-        localStorage.setItem('themeMode', 'manual');
-        const currentTheme = htmlElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-        localStorage.setItem('theme', currentTheme);
+      /* ==================================================
+         8. TAGLINE SCRAMBLE DECODE ON LOAD
+      ================================================== */
+      const taglineEl = document.getElementById('hero-tagline');
+      if (taglineEl && !reducedMotion) {
+        const finalText = taglineEl.dataset.text || taglineEl.textContent;
+        const glyphs = 'アイウエオカキクケコ01/<>_#✦';
+        let frame = 0;
+        const scramble = () => {
+          const revealed = Math.floor(frame / 2.2);
+          let out = '';
+          for (let i = 0; i < finalText.length; i++) {
+            out += i < revealed
+              ? finalText[i]
+              : glyphs[Math.floor(Math.random() * glyphs.length)];
+          }
+          taglineEl.textContent = out;
+          frame++;
+          if (revealed <= finalText.length) {
+            requestAnimationFrame(scramble);
+          } else {
+            taglineEl.textContent = finalText;
+          }
+        };
+        setTimeout(() => requestAnimationFrame(scramble), 260);
       }
-    });
 
-    // 3. 手動モード切替ボタンの処理
-    toggleBtn.addEventListener('click', () => {
-      if (autoSwitch.checked) return;
+      /* ==================================================
+         9. EASTER EGG — TOOTHPICK AVATAR CANNON
+      ================================================== */
+      const avatarBtn = document.getElementById('avatar-btn');
+      const avatarHint = document.getElementById('avatar-hint');
+      const burstCanvas = document.getElementById('burst-canvas');
+      const burstCtx = burstCanvas.getContext('2d');
+      const toothpickImg = new Image();
+      toothpickImg.src = 'makebead-256x256.png';
 
-      const currentTheme = htmlElement.getAttribute('data-theme');
-      const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+      let avatarClicks = 0;
+      const particles = [];
+      let burstRunning = false;
 
-      applyTheme(nextTheme);
-      localStorage.setItem('theme', nextTheme);
-    });
+      const resizeBurst = () => {
+        burstCanvas.width = window.innerWidth;
+        burstCanvas.height = window.innerHeight;
+      };
+      resizeBurst();
+      window.addEventListener('resize', resizeBurst);
 
-    // 4. 自動モード中、OS側のテーマがリアルタイムで変わったら即座に追従する
-    osLightQuery.addEventListener('change', (e) => {
-      if (autoSwitch.checked) {
-        applyTheme(e.matches ? 'light' : 'dark');
-      }
-    });
+      const MAX_PARTICLES = 480;
 
-    initTheme();
+      const pushParticle = (p) => {
+        if (particles.length >= MAX_PARTICLES) {
+          particles.shift();
+        }
+        particles.push(p);
+      };
+
+      const startBurstLoop = () => {
+        if (!burstRunning) {
+          burstRunning = true;
+          requestAnimationFrame(animateBurst);
+        }
+      };
+
+      const spawnToothpicks = (originX, originY, count) => {
+        for (let i = 0; i < count; i++) {
+          const angle = -Math.PI / 2 + (Math.random() - 0.5) * 2.1;
+          const speed = 7 + Math.random() * 14;
+          pushParticle({
+            x: originX,
+            y: originY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 3,
+            size: 28 + Math.random() * 34,
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 0.28,
+            gravity: 0.45,
+            bounces: 0,
+            alpha: 1
+          });
+        }
+        startBurstLoop();
+      };
+
+      const spawnToothpickStorm = () => {
+        const w = burstCanvas.width;
+        const h = burstCanvas.height;
+
+        // Wave 1: Left & right side cannons
+        for (let i = 0; i < 48; i++) {
+          const fromLeft = i % 2 === 0;
+          pushParticle({
+            x: fromLeft ? -20 : w + 20,
+            y: h * (0.2 + Math.random() * 0.65),
+            vx: (fromLeft ? 1 : -1) * (10 + Math.random() * 15),
+            vy: -6 - Math.random() * 11,
+            size: 32 + Math.random() * 44,
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 0.38,
+            gravity: 0.36,
+            bounces: 1,
+            alpha: 1
+          });
+        }
+
+        // Wave 2: Overhead toothpick rain
+        setTimeout(() => {
+          for (let i = 0; i < 64; i++) {
+            pushParticle({
+              x: Math.random() * w,
+              y: -40 - Math.random() * 260,
+              vx: (Math.random() - 0.5) * 6,
+              vy: 3 + Math.random() * 7,
+              size: 24 + Math.random() * 52,
+              rot: Math.random() * Math.PI * 2,
+              vrot: (Math.random() - 0.5) * 0.32,
+              gravity: 0.32,
+              bounces: Math.random() < 0.45 ? 1 : 0,
+              alpha: 1
+            });
+          }
+          startBurstLoop();
+        }, 180);
+
+        // Wave 3: Center fountain finale
+        setTimeout(() => {
+          for (let i = 0; i < 36; i++) {
+            const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.8;
+            const speed = 11 + Math.random() * 14;
+            pushParticle({
+              x: w * 0.5 + (Math.random() - 0.5) * 120,
+              y: h + 10,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              size: 30 + Math.random() * 42,
+              rot: Math.random() * Math.PI * 2,
+              vrot: (Math.random() - 0.5) * 0.4,
+              gravity: 0.4,
+              bounces: 0,
+              alpha: 1
+            });
+          }
+          startBurstLoop();
+        }, 420);
+
+        startBurstLoop();
+
+        // Subtle screen shake (on hero & main, never body so fixed UI stays rock-solid)
+        if (!reducedMotion) {
+          const targets = [heroSection, document.querySelector('main')].filter(Boolean);
+          targets.forEach((el) => {
+            el.classList.remove('is-storm-shake');
+            void el.offsetWidth;
+            el.classList.add('is-storm-shake');
+            setTimeout(() => el.classList.remove('is-storm-shake'), 450);
+          });
+        }
+      };
+
+      const animateBurst = () => {
+        burstCtx.clearRect(0, 0, burstCanvas.width, burstCanvas.height);
+        burstCtx.imageSmoothingEnabled = false;
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.vy += p.gravity ?? 0.45;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vrot;
+
+          if (p.bounces > 0 && p.y > burstCanvas.height - p.size * 0.35 && p.vy > 0) {
+            p.y = burstCanvas.height - p.size * 0.35;
+            p.vy *= -0.56;
+            p.vx *= 0.82;
+            p.bounces--;
+          }
+
+          if (p.y > burstCanvas.height + 90 || p.x < -140 || p.x > burstCanvas.width + 140) {
+            particles.splice(i, 1);
+            continue;
+          }
+          burstCtx.save();
+          burstCtx.translate(p.x, p.y);
+          burstCtx.rotate(p.rot);
+          burstCtx.globalAlpha = p.alpha;
+          burstCtx.drawImage(toothpickImg, -p.size / 2, -p.size / 2, p.size, p.size);
+          burstCtx.restore();
+        }
+
+        if (particles.length > 0) {
+          requestAnimationFrame(animateBurst);
+        } else {
+          burstRunning = false;
+        }
+      };
+
+      // Secret cheat code: type "tumayouzi" anywhere to unleash Toothpick Storm
+      const SECRET_CODE = 'tumayouzi';
+      let keyBuffer = '';
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
+        keyBuffer = (keyBuffer + e.key.toLowerCase()).slice(-SECRET_CODE.length);
+        if (keyBuffer === SECRET_CODE) {
+          keyBuffer = '';
+          spawnToothpickStorm();
+          showToast('CHEAT ACTIVATED: つまよーじストーム!!');
+        }
+      });
+
+      avatarBtn.addEventListener('click', () => {
+        avatarClicks++;
+        avatarBtn.classList.add('is-popping');
+        setTimeout(() => avatarBtn.classList.remove('is-popping'), 150);
+
+        const rect = avatarBtn.getBoundingClientRect();
+        const ox = rect.left + rect.width / 2;
+        const oy = rect.top + rect.height / 2;
+
+        avatarHint.classList.add('is-shown');
+        if (avatarClicks % 5 === 0) {
+          avatarHint.textContent = `TOOTHPICK BURST ×${avatarClicks}`;
+          spawnToothpicks(ox, oy, 26);
+          showToast(`つまよーじ砲 発射!! (${avatarClicks} HIT)`);
+        } else {
+          const remain = 5 - (avatarClicks % 5);
+          avatarHint.textContent = `${avatarClicks} CLICK (${remain} TO BURST)`;
+          spawnToothpicks(ox, oy, 2);
+        }
+      });
+
+      /* ==================================================
+         10. INTERACTIVE QUOTES & SKILL INSPECTOR
+      ================================================== */
+      const quotes = [
+        'あれもこれもバイブスコーディング。',
+        '概要なんてねえや。',
+        '再再再再再再デプロイの精神。',
+        'DBはSupabase、魂はバイブス。',
+        '真っ黒か真っ白、それが一番つよい。',
+        '勢いとノリは最強のフレームワーク。',
+        'とりあえず Vercel に上げてから考える。'
+      ];
+      let quoteIndex = 0;
+      const quoteEl = document.getElementById('vibe-quote');
+      document.getElementById('shuffle-quote').addEventListener('click', () => {
+        quoteIndex = (quoteIndex + 1) % quotes.length;
+        quoteEl.textContent = quotes[quoteIndex];
+      });
+
+      const skillNote = document.getElementById('skill-note');
+      const skillBtns = document.querySelectorAll('.skill-pill');
+      skillBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          skillBtns.forEach((b) => b.classList.remove('is-selected'));
+          btn.classList.add('is-selected');
+          skillNote.textContent = `→ ${btn.dataset.note}`;
+        });
+      });
+
+      /* ==================================================
+         11. OPTIONAL AMBIENT PENTATONIC SYNTH (MUSIC CARD)
+      ================================================== */
+      const musicCard = document.getElementById('music-card');
+      const soundState = document.getElementById('sound-state');
+      let audioCtx = null;
+      let synthInterval = null;
+      let isPlaying = false;
+
+      const scaleFreqs = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+
+      const playChillNote = () => {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const freq = scaleFreqs[Math.floor(Math.random() * scaleFreqs.length)];
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.045, now + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 1.65);
+      };
+
+      const toggleMusic = () => {
+        if (!isPlaying) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) {
+            showToast('Web Audio 非対応ブラウザです');
+            return;
+          }
+          audioCtx = audioCtx || new AudioContextClass();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          isPlaying = true;
+          musicCard.classList.add('is-playing');
+          musicCard.setAttribute('aria-pressed', 'true');
+          soundState.textContent = '● SYNTH: PLAYING (CLICK TO STOP)';
+          playChillNote();
+          synthInterval = setInterval(playChillNote, 820);
+        } else {
+          isPlaying = false;
+          clearInterval(synthInterval);
+          musicCard.classList.remove('is-playing');
+          musicCard.setAttribute('aria-pressed', 'false');
+          soundState.textContent = '● SYNTH: OFF';
+        }
+      };
+
+      musicCard.addEventListener('click', toggleMusic);
+      musicCard.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleMusic();
+        }
+      });
+
+      /* ==================================================
+         12. LIVE GITHUB REPOSITORIES FEED
+      ================================================== */
+      const reposGrid = document.getElementById('repos-grid');
+
+      const escapeHTML = (str) =>
+        String(str).replace(/[&<>"']/g, (m) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[m]));
+
+      const renderFallbackRepo = () => {
+        reposGrid.innerHTML = `
+          <a href="https://github.com/8mykg" target="_blank" rel="noopener noreferrer" class="bento-card repo-card" data-reveal style="--delay: 0">
+            <div>
+              <div class="repo-top">
+                <h3 class="repo-name">8mykg / repositories</h3>
+                <span class="repo-arrow" aria-hidden="true">↗</span>
+              </div>
+              <p class="repo-desc">HTML / CSS / JavaScript で作った実験作や Web アプリを GitHub と Vercel で公開しています。</p>
+            </div>
+            <div class="repo-meta">
+              <span class="repo-lang"><span class="lang-dot"></span>GitHub Profile</span>
+              <span>VIEW ALL ↗</span>
+            </div>
+          </a>
+        `;
+        reposGrid.querySelectorAll('.bento-card').forEach(attachCardSpotlight);
+        observeReveals(reposGrid);
+      };
+
+      fetch('https://api.github.com/users/8mykg/repos?sort=updated&per_page=8')
+        .then((res) => {
+          if (!res.ok) throw new Error('GitHub API error');
+          return res.json();
+        })
+        .then((repos) => {
+          if (!Array.isArray(repos) || repos.length === 0) {
+            renderFallbackRepo();
+            return;
+          }
+          const nonForks = repos.filter((r) => !r.fork);
+          const list = (nonForks.length > 0 ? nonForks : repos).slice(0, 6);
+
+          reposGrid.innerHTML = list.map((repo, idx) => {
+            const url = repo.homepage && repo.homepage.startsWith('http')
+              ? repo.homepage
+              : repo.html_url;
+            const desc = repo.description
+              ? escapeHTML(repo.description)
+              : '勢いとノリで作られた実験的プロジェクト。';
+            const lang = repo.language ? escapeHTML(repo.language) : 'Code';
+            const updated = new Date(repo.updated_at).toLocaleDateString('ja-JP', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            });
+
+            return `
+              <a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" class="bento-card repo-card" data-reveal style="--delay: ${idx % 2}">
+                <div>
+                  <div class="repo-top">
+                    <h3 class="repo-name">${escapeHTML(repo.name)}</h3>
+                    <span class="repo-arrow" aria-hidden="true">↗</span>
+                  </div>
+                  <p class="repo-desc">${desc}</p>
+                </div>
+                <div class="repo-meta">
+                  <span class="repo-lang"><span class="lang-dot"></span>${lang}</span>
+                  <span>★ ${repo.stargazers_count} · ${updated}</span>
+                </div>
+              </a>
+            `;
+          }).join('');
+
+          reposGrid.querySelectorAll('.bento-card').forEach(attachCardSpotlight);
+          observeReveals(reposGrid);
+        })
+        .catch(renderFallbackRepo);
+    })();
   </script>
-
 </body>
 
 </html>
